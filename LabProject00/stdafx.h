@@ -13,3 +13,6 @@
 #include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
+
+//”stdafx.h"는 프로그램에서 사용하는 주요 헤더 파일들을 포함한다. 나중에 이 파일에
+// Direct3D 12의 헤더 파일을 추가할 것이다.
