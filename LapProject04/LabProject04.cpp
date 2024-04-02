@@ -3,12 +3,12 @@
 
 #include "stdafx.h"
 #include "CGameFramework.h"
-#include "LabProject02.h"
+#include "LabProject04.h"
 
 #define MAX_LOADSTRING 100
 
 // 전역 변수:
-HINSTANCE hInst;                                // 현재 인스턴스입니다.
+HINSTANCE ghAppInstance;
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 CGameFramework gGameFramework;
@@ -20,9 +20,9 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+    _In_opt_ HINSTANCE hPrevInstance,
+    _In_ LPWSTR    lpCmdLine,
+    _In_ int       nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
@@ -31,16 +31,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadStringW(hInstance, IDC_WINDOWSPROJECT2, szWindowClass, MAX_LOADSTRING);
+    LoadStringW(hInstance, IDC_LAPPROJECT04, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
 
     // 애플리케이션 초기화를 수행합니다:
-    if (!InitInstance (hInstance, nCmdShow))
+    if (!InitInstance(hInstance, nCmdShow))
     {
         return FALSE;
     }
 
-    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_WINDOWSPROJECT2));
+    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_LAPPROJECT04));
 
     MSG msg;
 
@@ -63,7 +63,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
     gGameFramework.OnDestroy();
 
-    return (int) msg.wParam;
+    return (int)msg.wParam;
 }
 
 
@@ -83,7 +83,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.cbClsExtra = 0;
     wcex.cbWndExtra = 0;
     wcex.hInstance = hInstance;
-    wcex.hIcon = ::LoadIcon(hInstance, MAKEINTRESOURCE(IDI_WINDOWSPROJECT2));
+    wcex.hIcon = ::LoadIcon(hInstance, MAKEINTRESOURCE(IDI_LAPPROJECT04));
     wcex.hCursor = ::LoadCursor(NULL, IDC_ARROW);
     wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     //주 윈도우의 메뉴가 나타나지 않도록 한다. 
@@ -106,18 +106,20 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   RECT rc = { 0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT };
-   DWORD dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_BORDER;
-   AdjustWindowRect(&rc, dwStyle, FALSE);
+    ghAppInstance = hInstance;
+    RECT rc = { 0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT };
+    DWORD dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX | WS_BORDER | WS_SYSMENU;
+    AdjustWindowRect(&rc, dwStyle, FALSE);
     HWND hMainWnd = CreateWindow(szWindowClass, szTitle, dwStyle, CW_USEDEFAULT,
-       CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, hInstance, NULL);
-   if (!hMainWnd) return(FALSE);
-
-   gGameFramework.OnCreate(hInstance, hMainWnd);
-
-   ::ShowWindow(hMainWnd, nCmdShow);
-   ::UpdateWindow(hMainWnd);
-   return(TRUE);
+        CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, hInstance, NULL);
+    if (!hMainWnd) return(FALSE);
+    gGameFramework.OnCreate(hInstance, hMainWnd);
+    ::ShowWindow(hMainWnd, nCmdShow);
+    ::UpdateWindow(hMainWnd);
+#ifdef _WITH_SWAPCHAIN_FULLSCREEN_STATE
+    gGameFramework.ChangeSwapChainState();
+#endif
+    return(TRUE);
 }
 
 //
