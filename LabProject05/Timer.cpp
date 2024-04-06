@@ -1,6 +1,5 @@
 #pragma once
 
-#include "stdafx.h"
 #include "CGameFramework.h"
 
 CGameTimer::CGameTimer()
